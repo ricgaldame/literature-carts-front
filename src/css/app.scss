@@ -1,0 +1,89 @@
+// app global css in SCSS form
+// @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+// @font-face {
+//     font-family: latofont;
+//     src: url(../font/lato/Lato-Regular.ttf);
+// }
+
+// body {
+//     // font-family: 'montserratfont', sans-serif;
+//     font-family: latofont;
+// }
+
+@font-face {
+    font-family: 'montserratfont',;
+    src: url(../font/montserrat/Montserrat-Regular.ttf);
+}
+
+body {
+    font-family: 'montserratfont';
+}
+
+a {
+    text-decoration: none;
+}
+
+.q-btn {
+    font-size: 15px;
+    background-color: $primary;
+    color: white;
+    //padding-top: 10px;
+}
+
+.q-btn:hover {
+    background-color: $primary-dark;
+    color: white;
+}
+
+.q-date {
+    .q-btn {
+        font-size: 15px;
+        background-color: transparent;
+        color: grey;
+        //padding-top: 10px;
+    }
+}
+
+.btn-transparent {
+    background-color: transparent;
+    border: 1px solid $primary;
+    color: $primary;
+    font-size: 15px
+}
+
+.btn-transparent::before {
+    box-shadow: none;
+}
+
+.q-diag {
+    background-color: $primary
+}
+
+.q-bar-style {
+    background-color: $primary;
+}
+
+.q-table__control {
+    .q-btn {
+        background-color: transparent;
+        color: grey;
+        //padding-top: 10px;
+    }
+}
+
+.q-table__progress {
+    position: relative; 
+    z-index: 1;
+}
+
+.q-carousel {
+    .q-btn {
+        background-color: transparent;
+        //color: grey;
+        //padding-top: 10px;
+    }
+    .q-icon {
+        color: white;
+        text-shadow: 5px 5px 5px black
+    }
+}
