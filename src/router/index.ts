@@ -7,6 +7,8 @@ import {
 } from 'vue-router';
 
 import routes from './routes';
+import { useCongregationStore } from 'src/stores/congregationStore';
+import { storeToRefs } from 'pinia' 
 
 /*
  * If not building with SSR mode, you can
@@ -18,6 +20,9 @@ import routes from './routes';
  */
 
 export default route(function (/* { store, ssrContext } */) {
+  const congregationStore = useCongregationStore();
+	const { getCongregation } = storeToRefs(congregationStore);
+
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
@@ -30,6 +35,11 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.afterEach((to) => {
+    const defaultTitle = `Carrito ${getCongregation.value}`;
+    document.title = defaultTitle;
   });
 
   return Router;
