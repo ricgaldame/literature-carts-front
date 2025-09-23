@@ -6,7 +6,7 @@
           <div style="font-size: 16px; padding-left: 10px">
             <q-img
               class="icon"
-              src="/static/carrito.jpg"
+              src="/static/carrito.png"
             />
           </div>
         </div>
@@ -95,6 +95,12 @@
       style="width: 100%"
     >
       <q-list style=" margin-top: 10px;">
+        <div style="font-size: 16px; padding-left: 10px; margin-bottom: 10px;">
+          <q-img
+            class="icon"
+            src="/static/carrito.png"
+          />
+        </div>
         <div
           v-for="link in navBar"
           :key="link.title"
@@ -347,9 +353,9 @@ export default defineComponent({
     //margin-left: 10px;
     margin: 0px;
     padding: 0px;
-    background-color: $primary;
+    background-color: transparent;
     border-radius: 50%;
-    border: 1px solid rgb(108, 104, 104);
+    border: 1px solid $primary;
     overflow: hidden; 
 	  cursor: pointer;
   }
