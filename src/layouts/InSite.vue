@@ -163,6 +163,26 @@ let navList = [
     visible: true
   },
   {
+    name: 'volunteers',
+    title: 'Voluntarios',
+    icon: 'wc',
+    type: 'link',
+    link: 'volunteers',
+    navBar: true,
+    separator: true,
+    visible: true
+  },
+  {
+    name: 'congregations',
+    title: 'Congregaciones',
+    icon: 'groups',
+    type: 'link',
+    link: 'congregations',
+    navBar: true,
+    separator: true,
+    visible: true
+  },
+  {
     name: 'account',
     title: '',
     icon: 'person',
@@ -277,10 +297,10 @@ export default defineComponent({
         let index2 = findIdx(this.navBar[index1].menu , 'CUENTA');
         if(this.navBar[index1]?.menu) this.navBar[index1].menu[index2].items[0].name = attributes.email;
 
-        // let index3 = findIdx(this.navBar, 'volunteers');
-        // this.navBar[index3].visible = this.isAdmin;
-        // let index4 = findIdx(this.navBar, 'congregations');
-        // this.navBar[index4].visible = this.isAdmin;
+        let index3 = findIdx(this.navBar, 'volunteers');
+        this.navBar[index3].visible = this.isAdmin;
+        let index4 = findIdx(this.navBar, 'congregations');
+        this.navBar[index4].visible = this.isAdmin;
         // let index5 = findIdx(this.navBar, 'shifts');
         // this.navBar[index5].visible = this.isAdmin;
         // let index6 = findIdx(this.navBar, 'calendar');

@@ -18,6 +18,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/layouts/InSite.vue'),
     children: [
       { path: '/assignments', component: () => import('src/pages/Assignments.vue') },
+      { path: '/volunteers', component: () => import('src/pages/Volunteers.vue') },
     ],
   },
   {
