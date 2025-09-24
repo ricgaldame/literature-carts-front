@@ -14,7 +14,7 @@
         Voluntarios
       </div>
       <div class="add-volunteer-class">
-        <q-icon name="add_circle" @click="showCreateUpdateVolunteerDialog(null)"/>
+        <q-icon name="add_circle" @click="showCreateUpdateVolunteerDialog(null, true)"/>
       </div>
     </div>
     <q-table
@@ -74,14 +74,11 @@
                 <q-popup-proxy :offset="[-30, -60]" v-model="menuMore[props.rowIndex]">
                   <q-banner class="more-menu">
                     <div class="column justify-center" style="font-size: 16px">
-                      <div class="menu-profile">
+                      <div class="menu-profile" @click="showCreateUpdateVolunteerDialog(props.row, false)">
                         <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Voluntario
                       </div>
-                      <div class="menu-profile"  @click="showCreateUpdateVolunteerDialog(props.row)">
+                      <div class="menu-profile"  @click="showCreateUpdateVolunteerDialog(props.row, true)">
                         <q-icon name="edit" size="18px" style="margin-right: 10px;"/>Editar
-                      </div>
-                      <div class="menu-profile">
-                        <q-icon name="manage_accounts" size="18px" style="margin-right: 10px;"/>Roles
                       </div>
                       <div 
                         class="menu-profile" 
@@ -125,17 +122,12 @@
       </template>
     </q-table>
   </div>
-  <!-- <q-dialog v-model="checkVolunteerDialog" persistent>
-    <CheckVolunteer 
-      :volunteerData="volunteerData"
-      @close-check-volunteer-dialog="closeCheckVolunteerDialog"
-    />
-  </q-dialog>  -->
   <q-dialog v-model="createUpdateVolunteerDialog" persistent>
     <CreateUpdateVolunteer 
       :volunteerDataEntry="volunteerData"
       :congregations="congregations"
       :roles="roles"
+      :createOrUpdate="createOrUpdate"
       @close-create-update-volunteer-dialog="closeCreateUpdateVolunteerDialog"
       @get-volunteers="getVolunteers"
     />
@@ -148,14 +140,12 @@ import { getUsers } from 'src/api/queries/getUsers';
 import { getRoles } from 'src/api/queries/getRoles';
 import { getCongregations } from 'src/api/queries/getCongregations';
 import { useQuery } from '@vue/apollo-composable';
-// import CheckVolunteer from 'src/components/volunteers/CheckVolunteer.vue';
 import CreateUpdateVolunteer from 'src/components/volunteers/CreateUpdateVolunteer.vue';
 
 export default defineComponent({
   name: 'VoluntariesPage',
   emits: ['update-nav-bar'],
   components: {
-    // CheckVolunteer,
     CreateUpdateVolunteer
   },
   data(){
@@ -165,6 +155,7 @@ export default defineComponent({
       congregation_code: process.env.CONGREGATION_CODE || '',
       createUpdateVolunteerDialog: false,
       checkVolunteerDialog: false,
+      createOrUpdate: false
     }
   },
   async mounted(){
@@ -240,7 +231,6 @@ export default defineComponent({
   },
   methods:{
     async init(){
-      this.isLoading = true;
       this.$emit('update-nav-bar', {});
       try {
         await this.getUsersFunc({ congregation_code: this.congregation_code });
@@ -259,27 +249,30 @@ export default defineComponent({
       catch (error) {
         console.error('Error al obtener los datos:', error);
       }      
-      this.isLoading = false;
     },
     closeCreateUpdateVolunteerDialog(){
       this.createUpdateVolunteerDialog = false;
     },
-    showCreateUpdateVolunteerDialog(volunteer: any){
+    showCreateUpdateVolunteerDialog(volunteer: any, createOrUpdate: boolean){
+      this.createOrUpdate = createOrUpdate;
       this.volunteerData = volunteer;
       this.createUpdateVolunteerDialog = true;
-      this.menuMore = [];
-    },
-    closeCheckVolunteerDialog(){
-      this.checkVolunteerDialog = false;
-    },
-    showCheckVolunteerDialog(volunteer: any){
-      this.volunteerData = volunteer;
-      this.checkVolunteerDialog = true;
       this.menuMore = [];
     },
     async getVolunteers(){
       await this.init();
     },
+  },
+  watch:{
+    getUsersLoading(newVal, oldVal){
+      this.isLoading = this.getUsersLoading || this.getRolesLoading || this.getCongregationsLoading;
+    },
+    getRolesLoading(newVal, oldVal){
+      this.isLoading = this.getUsersLoading || this.getRolesLoading || this.getCongregationsLoading;
+    },
+    getCongregationsLoading(newVal, oldVal){
+      this.isLoading = this.getUsersLoading || this.getRolesLoading || this.getCongregationsLoading;
+    }
   }
 });
 </script>

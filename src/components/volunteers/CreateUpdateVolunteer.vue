@@ -14,7 +14,7 @@
 			/>
 		</div>
 		<q-card-section>
-			<div class="text-h6">{{ isNewVolunteer ? 'Crear nuevo' : 'Actualizar' }} voluntario</div>
+			<div class="text-h6">{{ isNewVolunteer ? 'Crear nuevo' : (createOrUpdate ? 'Actualizar' : 'Datos') }} voluntario</div>
     </q-card-section>
 		<q-separator />
 		<q-card-section>
@@ -50,7 +50,7 @@
 						marginBottom: '0px',
 						padding: '0px'
 					}"
-					:disable="!isNewVolunteer"
+					:disable="!isNewVolunteer || !createOrUpdate"
 				>
 					<template v-slot:prepend>
 						<q-icon name="mail" />
@@ -74,6 +74,7 @@
 						marginBottom: '0px',
 						padding: '0px'
 					}"
+					:disable="!createOrUpdate"
 				>
 					<template v-slot:prepend>
 						<q-icon name="perm_identity" />
@@ -97,6 +98,7 @@
 						marginBottom: '0px',
 						padding: '0px'
 					}"
+					:disable="!createOrUpdate"
 				>
 					<template v-slot:prepend>
 						<q-icon name="perm_identity" />
@@ -120,6 +122,7 @@
 						marginBottom: '0px',
 						padding: '0px'
 					}"
+					:disable="!createOrUpdate"
 				>
 					<template v-slot:prepend>
 						<q-icon name="perm_identity" />
@@ -170,6 +173,7 @@
 						:error="noCongregation"
 						error-message="Debe seleccionar congregación"
 						@update:model-value="() => noCongregation = false"
+						:disable="!createOrUpdate"
 					>
 						<template v-slot:prepend>
 							<q-icon name="people_alt" />
@@ -228,6 +232,7 @@
 						:error="noRole"
 						error-message="Debe seleccionar rol"
 						@update:model-value="() => noRole = false"
+						:disable="!createOrUpdate"
 					>
 						<template v-slot:prepend>
 							<q-icon name="people_alt" />
@@ -244,7 +249,7 @@
 			</div>
 		</q-card-section>
 		<q-card-section>
-			<div class="row justify-end items-center">
+			<div class="row justify-end items-center"  v-if="createOrUpdate">
 				<div v-if="isNewVolunteer">
 					<q-btn 
 						class="q-btn btn-transparent" 
@@ -308,6 +313,10 @@ export default defineComponent({
 		},
 		roles: {
 			type: null,
+			required: true
+		},
+		createOrUpdate: {
+			type: Boolean,
 			required: true
 		}
 	},
