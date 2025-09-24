@@ -289,7 +289,7 @@
 import { defineComponent, ref } from 'vue';
 import { isRequired, isEmail, checkValidation } from 'src/tools/validations';
 import CustomDialog from 'src/components/CustomDialog.vue';
-import { addUser } from 'src/api/queries/addUser';
+import { addUser } from 'src/api/mutations/addUser';
 import { updateUser } from 'src/api/queries/updateUser';
 import { useMutation } from '@vue/apollo-composable';
 
