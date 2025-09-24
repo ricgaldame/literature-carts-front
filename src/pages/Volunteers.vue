@@ -14,7 +14,7 @@
         Voluntarios
       </div>
       <div class="add-volunteer-class">
-        <q-icon name="add_circle"/>
+        <q-icon name="add_circle" @click="showCreateUpdateVolunteerDialog(null)"/>
       </div>
     </div>
     <q-table
@@ -77,7 +77,7 @@
                       <div class="menu-profile">
                         <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Voluntario
                       </div>
-                      <div class="menu-profile">
+                      <div class="menu-profile"  @click="showCreateUpdateVolunteerDialog(props.row)">
                         <q-icon name="edit" size="18px" style="margin-right: 10px;"/>Editar
                       </div>
                       <div class="menu-profile">
@@ -124,25 +124,56 @@
         </q-tr>
       </template>
     </q-table>
-  </div> 
+  </div>
+  <!-- <q-dialog v-model="checkVolunteerDialog" persistent>
+    <CheckVolunteer 
+      :volunteerData="volunteerData"
+      @close-check-volunteer-dialog="closeCheckVolunteerDialog"
+    />
+  </q-dialog>  -->
+  <q-dialog v-model="createUpdateVolunteerDialog" persistent>
+    <CreateUpdateVolunteer 
+      :volunteerDataEntry="volunteerData"
+      :congregations="congregations"
+      :roles="roles"
+      @close-create-update-volunteer-dialog="closeCreateUpdateVolunteerDialog"
+      @get-volunteers="getVolunteers"
+    />
+  </q-dialog>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { getUsers } from 'src/api/queries/getUsers';
+import { getRoles } from 'src/api/queries/getRoles';
+import { getCongregations } from 'src/api/queries/getCongregations';
 import { useQuery } from '@vue/apollo-composable';
+// import CheckVolunteer from 'src/components/volunteers/CheckVolunteer.vue';
+import CreateUpdateVolunteer from 'src/components/volunteers/CreateUpdateVolunteer.vue';
 
 export default defineComponent({
   name: 'VoluntariesPage',
   emits: ['update-nav-bar'],
+  components: {
+    // CheckVolunteer,
+    CreateUpdateVolunteer
+  },
   data(){
     return {
       isMounted: false,
       isLoading: false,
-      congregation_code: process.env.CONGREGATION_CODE || ''
+      congregation_code: process.env.CONGREGATION_CODE || '',
+      createUpdateVolunteerDialog: false,
+      checkVolunteerDialog: false,
     }
   },
   async mounted(){
+    await this.getRolesFunc();
+    await this.getCongregationsFunc();
+
+    this.roles = this.getRolesData.getRoles;
+    this.congregations = this.getCongregationsData.getCongregations;
+
     await this.init();
     this.isMounted = true;
   },
@@ -159,22 +190,52 @@ export default defineComponent({
     ];
     const rows: any = ref([10]);
     const menuMore: any = ref([]);
-
+    const roles: any = ref([]);
     const volunteerData: any = ref(null);
+    const congregations: any = ref(null);
 
-    const { refetch: getUsersFunc, loading: getUsersLoading, result: getUsersData, error: getUsersError } = useQuery(getUsers, { congregation_code: '' });
+    const { 
+      refetch: getUsersFunc, 
+      loading: getUsersLoading, 
+      result: getUsersData, 
+      error: getUsersError 
+    } = useQuery(getUsers, { congregation_code: '' });
+
+    const { 
+      refetch: getRolesFunc, 
+      loading: getRolesLoading, 
+      result: getRolesData, 
+      error: getRolesError 
+    } = useQuery(getRoles);
+
+    const { 
+      refetch: getCongregationsFunc, 
+      loading: getCongregationsLoading, 
+      result: getCongregationsData, 
+      error: getCongregationsError 
+    } = useQuery(getCongregations);
 
     return { 
       users,
+      roles,
       columns,
       rows,
       menuMore,
       filter,
-      volunteerData,
       getUsersFunc,
       getUsersLoading,
       getUsersData,
-      getUsersError
+      getUsersError,
+      getRolesFunc,
+      getRolesLoading,
+      getRolesData,
+      getRolesError,
+      volunteerData,
+      congregations,
+      getCongregationsFunc,
+      getCongregationsLoading,
+      getCongregationsData,
+      getCongregationsError
     };
   },
   methods:{
@@ -183,8 +244,8 @@ export default defineComponent({
       this.$emit('update-nav-bar', {});
       try {
         await this.getUsersFunc({ congregation_code: this.congregation_code });
-
         this.users = this.getUsersData.getUsers;
+
         this.rows = this.users.map((user: any) => {
           // console.log(profile)
           return {
@@ -199,6 +260,25 @@ export default defineComponent({
         console.error('Error al obtener los datos:', error);
       }      
       this.isLoading = false;
+    },
+    closeCreateUpdateVolunteerDialog(){
+      this.createUpdateVolunteerDialog = false;
+    },
+    showCreateUpdateVolunteerDialog(volunteer: any){
+      this.volunteerData = volunteer;
+      this.createUpdateVolunteerDialog = true;
+      this.menuMore = [];
+    },
+    closeCheckVolunteerDialog(){
+      this.checkVolunteerDialog = false;
+    },
+    showCheckVolunteerDialog(volunteer: any){
+      this.volunteerData = volunteer;
+      this.checkVolunteerDialog = true;
+      this.menuMore = [];
+    },
+    async getVolunteers(){
+      await this.init();
     },
   }
 });
