@@ -42,6 +42,12 @@ export const isCode = (value: string) => {
     return  (ev || 'Código inválido');
 };
 
+export const isCongregationCode = (value: string) => {
+    const stringValue = String(value);
+    const ev = /^[0-9]{1,10}$/.test(stringValue);
+    return ev || 'Código congregación inválido';
+  };
+
 export const isSupabaseCode = (value: string) => {
     const stringValue = (value as unknown) as string;
     const ev = /^[0-9]{6}$/.test(stringValue);

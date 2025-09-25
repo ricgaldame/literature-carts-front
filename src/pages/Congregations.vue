@@ -11,10 +11,10 @@
       }"
     >
       <div style="font-size: 20px;">
-        Voluntarios
+        Congregaciones
       </div>
-      <div class="add-volunteer-class">
-        <q-icon name="add_circle" @click="showCreateUpdateVolunteerDialog(null, true)"/>
+      <div class="add-congregation-class">
+        <q-icon name="add_circle" @click="showCreateUpdateCongregationDialog(null, true)"/>
       </div>
     </div>
     <q-table
@@ -74,10 +74,10 @@
                 <q-popup-proxy :offset="[-30, -60]" v-model="menuMore[props.rowIndex]">
                   <q-banner class="more-menu">
                     <div class="column justify-center" style="font-size: 16px">
-                      <div class="menu-profile" @click="showCreateUpdateVolunteerDialog(props.row, false)">
-                        <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Voluntario
+                      <div class="menu-profile" @click="showCreateUpdateCongregationDialog(props.row, false)">
+                        <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Congregación
                       </div>
-                      <div class="menu-profile"  @click="showCreateUpdateVolunteerDialog(props.row, true)">
+                      <div class="menu-profile"  @click="showCreateUpdateCongregationDialog(props.row, true)">
                         <q-icon name="edit" size="18px" style="margin-right: 10px;"/>Editar
                       </div>
                       <div 
@@ -122,81 +122,54 @@
       </template>
     </q-table>
   </div>
-  <q-dialog v-model="createUpdateVolunteerDialog" persistent>
-    <CreateUpdateVolunteer 
-      :volunteerDataEntry="volunteerData"
+  <q-dialog v-model="createUpdateCongregationDialog" persistent>
+    <CreateUpdateCongregation 
+      :congregationDataEntry="congregationData"
       :congregations="congregations"
-      :roles="roles"
       :createOrUpdate="createOrUpdate"
-      @close-create-update-volunteer-dialog="closeCreateUpdateVolunteerDialog"
-      @get-volunteers="getVolunteers"
+      @close-create-update-congregation-dialog="closeCreateUpdateCongregationDialog"
+      @get-congregations="getCongregations"
     />
   </q-dialog>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { getUsers } from 'src/api/queries/getUsers';
-import { getRoles } from 'src/api/queries/getRoles';
 import { getCongregations } from 'src/api/queries/getCongregations';
 import { useQuery } from '@vue/apollo-composable';
-import CreateUpdateVolunteer from 'src/components/volunteers/CreateUpdateVolunteer.vue';
+import CreateUpdateCongregation from 'src/components/congregations/CreateUpdateCongregation.vue';
 
 export default defineComponent({
-  name: 'VoluntariesPage',
+  name: 'CongregationsPage',
   emits: ['update-nav-bar'],
   components: {
-    CreateUpdateVolunteer
+    CreateUpdateCongregation
   },
   data(){
     return {
       isMounted: false,
       isLoading: false,
       congregation_code: process.env.CONGREGATION_CODE || '',
-      createUpdateVolunteerDialog: false,
+      createUpdateCongregationDialog: false,
       createOrUpdate: false
     }
   },
   async mounted(){
-    await this.getRolesFunc();
-    await this.getCongregationsFunc();
-
-    this.roles = this.getRolesData.getRoles;
-    this.congregations = this.getCongregationsData.getCongregations;
-
     await this.init();
     this.isMounted = true;
   },
   setup () {
-    const users: any = ref([]);
     const filter: any = ref('')
     const columns: any = [
-      { id: 'names', field: 'names', label: 'Nombres', align: 'left', },
-      { id: 'first_surname', field: 'first_surname', label: 'Apellido Paterno', align: 'left', },
-      { id: 'second_surname', field: 'second_surname', label: 'Apellido Materno', align: 'left', },
-      { id: 'email', field: 'email', label: 'Correo', align: 'left', },
-      { id: 'descriptionRole', field: 'descriptionRole', label: 'Rol', align: 'left', },
+      { id: 'id', field: 'id', label: 'ID', align: 'left', },
+      { id: 'name', field: 'name', label: 'Nombre', align: 'left', },
+      { id: 'code', field: 'code', label: 'Número', align: 'left', },
       { id: 'settings', field: 'settings', label: '', align: 'right', },
     ];
     const rows: any = ref([10]);
     const menuMore: any = ref([]);
-    const roles: any = ref([]);
-    const volunteerData: any = ref(null);
+    const congregationData: any = ref(null);
     const congregations: any = ref(null);
-
-    const { 
-      refetch: getUsersFunc, 
-      loading: getUsersLoading, 
-      result: getUsersData, 
-      error: getUsersError 
-    } = useQuery(getUsers, { congregation_code: '' });
-
-    const { 
-      refetch: getRolesFunc, 
-      loading: getRolesLoading, 
-      result: getRolesData, 
-      error: getRolesError 
-    } = useQuery(getRoles);
 
     const { 
       refetch: getCongregationsFunc, 
@@ -206,21 +179,11 @@ export default defineComponent({
     } = useQuery(getCongregations);
 
     return { 
-      users,
-      roles,
       columns,
       rows,
       menuMore,
       filter,
-      getUsersFunc,
-      getUsersLoading,
-      getUsersData,
-      getUsersError,
-      getRolesFunc,
-      getRolesLoading,
-      getRolesData,
-      getRolesError,
-      volunteerData,
+      congregationData,
       congregations,
       getCongregationsFunc,
       getCongregationsLoading,
@@ -232,14 +195,14 @@ export default defineComponent({
     async init(){
       this.$emit('update-nav-bar', {});
       try {
-        await this.getUsersFunc({ congregation_code: this.congregation_code });
-        this.users = this.getUsersData.getUsers;
+        await this.getCongregationsFunc();
 
-        this.rows = this.users.map((user: any) => {
+        this.congregations = this.getCongregationsData.getCongregations;
+
+        this.rows = this.congregations.map((congregation: any) => {
           // console.log(profile)
           return {
-            ...user,
-            descriptionRole: user.role.description,
+            ...congregation,
             settings: ''
           }
         });
@@ -249,28 +212,22 @@ export default defineComponent({
         console.error('Error al obtener los datos:', error);
       }      
     },
-    closeCreateUpdateVolunteerDialog(){
-      this.createUpdateVolunteerDialog = false;
+    closeCreateUpdateCongregationDialog(){
+      this.createUpdateCongregationDialog = false;
     },
-    showCreateUpdateVolunteerDialog(volunteer: any, createOrUpdate: boolean){
+    showCreateUpdateCongregationDialog(volunteer: any, createOrUpdate: boolean){
       this.createOrUpdate = createOrUpdate;
-      this.volunteerData = volunteer;
-      this.createUpdateVolunteerDialog = true;
+      this.congregationData = volunteer;
+      this.createUpdateCongregationDialog = true;
       this.menuMore = [];
     },
-    async getVolunteers(){
+    async getCongregations(){
       await this.init();
     },
   },
   watch:{
-    getUsersLoading(newVal, oldVal){
-      this.isLoading = this.getUsersLoading || this.getRolesLoading || this.getCongregationsLoading;
-    },
-    getRolesLoading(newVal, oldVal){
-      this.isLoading = this.getUsersLoading || this.getRolesLoading || this.getCongregationsLoading;
-    },
     getCongregationsLoading(newVal, oldVal){
-      this.isLoading = this.getUsersLoading || this.getRolesLoading || this.getCongregationsLoading;
+      this.isLoading = this.getCongregationsLoading;
     }
   }
 });
@@ -289,13 +246,13 @@ export default defineComponent({
     color: $secondary;
   }
 
-  .add-volunteer-class {
+  .add-congregation-class {
     font-size: 40px; 
     color: var(--q-primary);
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   }
 
-  .add-volunteer-class:hover {
+  .add-congregation-class:hover {
     color: var(--q-secondary);
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
   }

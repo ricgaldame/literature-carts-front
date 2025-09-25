@@ -10,7 +10,6 @@ const routes: RouteRecordRaw[] = [
       { path: '/change-password', component: () => import('pages/ChangePassword.vue') },
       { path: '/request-pin-code', component: () => import('pages/RequestPinCode.vue') },
       { path: '/signup', component: () => import('pages/SignUp.vue') },
-      // { path: '/signup', component: () => import('pages/SignUp.vue') },
     ],
   },
   {
@@ -19,6 +18,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '/assignments', component: () => import('src/pages/Assignments.vue') },
       { path: '/volunteers', component: () => import('src/pages/Volunteers.vue') },
+      { path: '/congregations', component: () => import('src/pages/Congregations.vue') },
     ],
   },
   {
