@@ -9,12 +9,12 @@
 		<div class="row justify-end items-center" style="margin-top: 10px; margin-right: 10px;">
 			<q-icon
 				name="close"
-				@click="closeCreateUpdateCongregationDialog"
+				@click="closeCreateUpdateRoleDialog"
 				class="close-button"
 			/>
 		</div>
 		<q-card-section>
-			<div class="text-h6">{{ isNewCongregation ? 'Crear nuevo' : (createOrUpdate ? 'Actualizar' : 'Datos') }} voluntario</div>
+			<div class="text-h6">{{ isNewRole ? 'Crear nuevo' : (createOrUpdate ? 'Actualizar' : 'Datos') }} rol</div>
     </q-card-section>
 		<q-separator />
 		<q-card-section>
@@ -30,18 +30,42 @@
 						margin-bottom: 10px;
 					"
 				>
-					DATOS CONGREGACIÓN
+					DATOS ROL
 				</div>
+				
+				<q-input
+					dense 
+					outlined
+					bg-color="white"
+					v-model="code"
+					ref="codeRef"
+					type="text"
+					label="Código"
+					placeholder="Código"
+					lazy-rules
+					:rules="[isRequiredStr]"
+					:style="{
+						width: $q.screen.lt.sm ? '100%' : '49%', 
+						marginTop: $q.screen.lt.sm ? '25px' : '10px',
+						marginBottom: '0px',
+						padding: '0px'
+					}"
+					:disable="!createOrUpdate"
+				>
+					<template v-slot:prepend>
+						<q-icon name="abc" />
+					</template>
+				</q-input>
 
 				<q-input
 					dense 
 					outlined
 					bg-color="white"
-					v-model="name"
-					ref="nameRef"
+					v-model="description"
+					ref="descriptionRef"
 					type="text"
-					label="Nombre"
-					placeholder="Nombre"
+					label="Descripción"
+					placeholder="Descripción"
 					lazy-rules
 					:rules="[isRequiredStr]"
 					:style="{
@@ -56,35 +80,11 @@
 						<q-icon name="perm_identity" />
 					</template>
 				</q-input>
-
-				<q-input
-					dense 
-					outlined
-					bg-color="white"
-					v-model="code"
-					ref="codeRef"
-					type="text"
-					label="Número"
-					placeholder="Número"
-					lazy-rules
-					:rules="[isCongregationCodeStr]"
-					:style="{
-						width: $q.screen.lt.sm ? '100%' : '49%', 
-						marginTop: $q.screen.lt.sm ? '25px' : '10px',
-						marginBottom: '0px',
-						padding: '0px'
-					}"
-					:disable="!createOrUpdate"
-				>
-					<template v-slot:prepend>
-						<q-icon name="numbers" />
-					</template>
-				</q-input>
 			</div>
 		</q-card-section>
 		<q-card-section>
 			<div class="row justify-end items-center"  v-if="createOrUpdate">
-				<div v-if="isNewCongregation">
+				<div v-if="isNewRole">
 					<q-btn 
 						class="q-btn btn-transparent" 
 						style="font-size: 15px; margin: 2px; min-width: 100px"
@@ -95,7 +95,7 @@
 					<q-btn 
 						class="q-btn" 
 						style="font-size: 15px; margin: 2px; min-width: 100px"
-						@click="createUpdateCongregation" 
+						@click="createUpdateRole" 
 					>
 						CREAR
 					</q-btn>
@@ -104,7 +104,7 @@
 					<q-btn 
 						class="q-btn" 
 						style="font-size: 15px; margin: 2px; min-width: 100px"
-						@click="createUpdateCongregation" 
+						@click="createUpdateRole" 
 					>
 						ACTUALIZAR
 					</q-btn>
@@ -126,22 +126,22 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { isCongregationCode, isRequired, checkValidation } from 'src/tools/validations';
+import { isRequired, checkValidation } from 'src/tools/validations';
 import CustomDialog from 'src/components/CustomDialog.vue';
-import { addCongregation } from 'src/api/mutations/addCongregation';
-import { updateCongregation } from 'src/api/mutations/updateCongregation';
+import { addRole } from 'src/api/mutations/addRole';
+import { updateRole } from 'src/api/mutations/updateRole';
 import { useMutation } from '@vue/apollo-composable';
 
 
 export default defineComponent({
-	name: 'CreateUpdateCongregationComponent',
-	emits: ['close-create-update-congregation-dialog', 'get-congregations'],
+	name: 'CreateUpdateRoleComponent',
+	emits: ['close-create-update-role-dialog', 'get-roles'],
 	props: {
-		congregationDataEntry: {
+		roleDataEntry: {
 			type: null,
 			required: true
 		},
-		congregations: {
+		roles: {
 			type: null,
 			required: true
 		},
@@ -156,42 +156,41 @@ export default defineComponent({
 	data() {
 		return {
 			isMounted: false,
-			isNewCongregation: false,
+			isNewRole: false,
 		}
 	},
 	async mounted(){
-		// console.log('congregationDataEntry', this.congregationDataEntry)
+		// console.log('roleDataEntry', this.roleDataEntry)
 		this.init();
 		this.isMounted = true;
 	},
 	setup(){
-		const name: any = ref(null);
+		const description: any = ref(null);
 		const code: any = ref(null);
 
-
-		const nameRef: any = ref();
+		const descriptionRef: any = ref();
 		const codeRef: any = ref();
 
-		const { mutate: addCongregationFunction } = useMutation(addCongregation);
-		const { mutate: updateCongregationFunction } = useMutation(updateCongregation);
+		const { mutate: addRoleFunction } = useMutation(addRole);
+		const { mutate: updateRoleFunction } = useMutation(updateRole);
 
 		const dialogs: any = ref({
-			createCongregation: {
+			createRole: {
         state: false,
         payload: {
-          id: 'createCongregation',
-          errorMessage: 'Error al crear la congregación',
-          successfulMessage: 'Congregación creada de forma exitosa',
+          id: 'createRole',
+          errorMessage: 'Error al crear el rol',
+          successfulMessage: 'Rol creado de forma exitosa',
           buttonTask: 'CREAR',
           buttonClose: 'CANCELAR',
-          content: '¿Está seguro que desea crear la congregación?',
+          content: '¿Está seguro que desea crear el rol?',
           title: {
-            executing: 'Creando congregación',
-            executed: 'Congregación creada',
-            start: 'Crear congregación',
+            executing: 'Creando rol',
+            executed: 'Rol creado',
+            start: 'Crear rol',
           },
           function: async (params: any) => {
-						const response: any = await addCongregationFunction(params);					
+						const response: any = await addRoleFunction(params);					
             const success = !!response?.data;
             return success ? { 
               result: response?.data,
@@ -201,22 +200,22 @@ export default defineComponent({
           params: null
         }
       },
-			updateCongregation: {
+			updateRole: {
         state: false,
         payload: {
-          id: 'updateCongregation',
-          errorMessage: 'Error al actualizar la congregación',
-          successfulMessage: 'Congregación actualizada de forma exitosa',
+          id: 'updateRole',
+          errorMessage: 'Error al actualizar el rol',
+          successfulMessage: 'Rol actualizado de forma exitosa',
           buttonTask: 'ACTUALIZAR',
           buttonClose: 'CANCELAR',
-          content: '¿Está seguro que desea actualizar la congregación?',
+          content: '¿Está seguro que desea actualizar la rol?',
           title: {
-            executing: 'Actualizando congregación',
-            executed: 'Congregación actualizada',
-            start: 'Actualizar congregación',
+            executing: 'Actualizando rol',
+            executed: 'Rol actualizado',
+            start: 'Actualizar rol',
           },
           function: async (params: any) => {
-						const response: any = await updateCongregationFunction(params);					
+						const response: any = await updateRoleFunction(params);					
             const success = !!response?.data;
             return success ? { 
               result: response?.data,
@@ -235,76 +234,73 @@ export default defineComponent({
     });
 		
 		return {
-			name,
+			description,
 			code,
 			dialogs,
 			checkValidation,
-			nameRef,
+			descriptionRef,
 			codeRef,
 			onValidate () {
-				nameRef.value.validate();
+				descriptionRef.value.validate();
 				codeRef.value.validate();
 			},
 			onReset() {
-				nameRef.value.resetValidation();
+				descriptionRef.value.resetValidation();
 				codeRef.value.resetValidation();
 			}
 		}
 	},
 	methods: {
 		init(){
-			// console.log(this.congregationDataEntry);
-			this.isNewCongregation = !this.congregationDataEntry ? true : false;
+			// console.log(this.roleDataEntry);
+			this.isNewRole = !this.roleDataEntry ? true : false;
 			
-			if(!this.isNewCongregation){
-				this.name = this.congregationDataEntry.name;
-				this.code = this.congregationDataEntry.code;
+			if(!this.isNewRole){
+				this.description = this.roleDataEntry.description;
+				this.code = this.roleDataEntry.code;
 			}
 		},
-		closeCreateUpdateCongregationDialog(){
-			this.$emit('close-create-update-congregation-dialog', {});
+		closeCreateUpdateRoleDialog(){
+			this.$emit('close-create-update-role-dialog', {});
 		},
 		isRequiredStr (val: string) {
 			return  isRequired(val);
 		},
-		isCongregationCodeStr (val: string) {
-			return  isCongregationCode(val);
-		},
 		clearFields(){
 			this.code = null;
-			this.name = null;
+			this.description = null;
 
 			this.onReset();
 		},
 		validation(){
 			return this.code
-			&& this.name;
+			&& this.description;
 		},
-		async createUpdateCongregation(){
+		async createUpdateRole(){
 			if(this.validation()) {
 				this.onReset();
-				let congregation: any = {
+				let role: any = {
 					code : this.code,
-					name: this.name
+					description: this.description
 				};
 
-				if(this.isNewCongregation){
-					this.dialogs.createCongregation.payload = {
-						...this.dialogs.createCongregation.payload,
-						params: congregation
+				if(this.isNewRole){
+					this.dialogs.createRole.payload = {
+						...this.dialogs.createRole.payload,
+						params: role
 					};
 
-					this.dialogs.createCongregation.state = true;
+					this.dialogs.createRole.state = true;
 				}
 				else {
-					// console.log('this.congregationDataEntry', this.congregationDataEntry)
-					congregation.id = this.congregationDataEntry.id;
-					this.dialogs.updateCongregation.payload = {
-						...this.dialogs.updateCongregation.payload,
-						params: congregation
+					// console.log('this.roleDataEntry', this.roleDataEntry)
+					role.id = this.roleDataEntry.id;
+					this.dialogs.updateRole.payload = {
+						...this.dialogs.updateRole.payload,
+						params: role
 					};
 
-					this.dialogs.updateCongregation.state = true;
+					this.dialogs.updateRole.state = true;
 				}
 			}
 			else {
@@ -314,13 +310,13 @@ export default defineComponent({
 		closeDialog(event: any){
       this.dialogs[event.id].state = false;
     },
-		getCongregations() {
-			this.$emit('get-congregations', {});
+		getRoles() {
+			this.$emit('get-roles', {});
 		},
 		executedDialog(event: any){
       this.closeDialog(event);
-			this.getCongregations();
-			this.closeCreateUpdateCongregationDialog();
+			this.getRoles();
+			this.closeCreateUpdateRoleDialog();
     },
 	},
 })

@@ -11,10 +11,10 @@
       }"
     >
       <div style="font-size: 20px;">
-        Congregaciones
+        Roles
       </div>
-      <div class="add-congregation-class">
-        <q-icon name="add_circle" @click="showCreateUpdateCongregationDialog(null, true)"/>
+      <div class="add-role-class">
+        <q-icon name="add_circle" @click="showCreateUpdateRoleDialog(null, true)"/>
       </div>
     </div>
     <q-table
@@ -74,10 +74,10 @@
                 <q-popup-proxy :offset="[-30, -60]" v-model="menuMore[props.rowIndex]">
                   <q-banner class="more-menu">
                     <div class="column justify-center" style="font-size: 16px">
-                      <div class="menu-profile" @click="showCreateUpdateCongregationDialog(props.row, false)">
-                        <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Congregación
+                      <div class="menu-profile" @click="showCreateUpdateRoleDialog(props.row, false)">
+                        <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Rol
                       </div>
-                      <div class="menu-profile"  @click="showCreateUpdateCongregationDialog(props.row, true)">
+                      <div class="menu-profile"  @click="showCreateUpdateRoleDialog(props.row, true)">
                         <q-icon name="edit" size="18px" style="margin-right: 10px;"/>Editar
                       </div>
                       <div 
@@ -122,35 +122,35 @@
       </template>
     </q-table>
   </div>
-  <q-dialog v-model="createUpdateCongregationDialog" persistent>
-    <CreateUpdateCongregation 
-      :congregationDataEntry="congregationData"
-      :congregations="congregations"
+  <q-dialog v-model="createUpdateRoleDialog" persistent>
+    <CreateUpdateRole 
+      :roleDataEntry="roleData"
+      :roles="roles"
       :createOrUpdate="createOrUpdate"
-      @close-create-update-congregation-dialog="closeCreateUpdateCongregationDialog"
-      @get-congregations="getCongregations"
+      @close-create-update-role-dialog="closeCreateUpdateRoleDialog"
+      @get-roles="getRoles"
     />
   </q-dialog>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { getCongregations } from 'src/api/queries/getCongregations';
+import { getRoles } from 'src/api/queries/getRoles';
 import { useQuery } from '@vue/apollo-composable';
-import CreateUpdateCongregation from 'src/components/congregations/CreateUpdateCongregation.vue';
+import CreateUpdateRole from 'src/components/roles/CreateUpdateRole.vue';
 
 export default defineComponent({
-  name: 'CongregationsPage',
+  name: 'RolesPage',
   emits: ['update-nav-bar'],
   components: {
-    CreateUpdateCongregation
+    CreateUpdateRole
   },
   data(){
     return {
       isMounted: false,
       isLoading: false,
       congregation_code: process.env.CONGREGATION_CODE || '',
-      createUpdateCongregationDialog: false,
+      createUpdateRoleDialog: false,
       createOrUpdate: false
     }
   },
@@ -162,47 +162,47 @@ export default defineComponent({
     const filter: any = ref('')
     const columns: any = [
       { id: 'id', field: 'id', label: 'ID', align: 'left', },
-      { id: 'name', field: 'name', label: 'Nombre', align: 'left', },
-      { id: 'code', field: 'code', label: 'Número', align: 'left', },
+      { id: 'code', field: 'code', label: 'Código', align: 'left', },
+      { id: 'description', field: 'description', label: 'Descripción', align: 'left', },
       { id: 'settings', field: 'settings', label: '', align: 'right', },
     ];
     const rows: any = ref([10]);
     const menuMore: any = ref([]);
-    const congregationData: any = ref(null);
-    const congregations: any = ref(null);
+    const roleData: any = ref(null);
+    const roles: any = ref(null);
 
     const { 
-      refetch: getCongregationsFunc, 
-      loading: getCongregationsLoading, 
-      result: getCongregationsData, 
-      error: getCongregationsError 
-    } = useQuery(getCongregations);
+      refetch: getRolesFunc, 
+      loading: getRolesLoading, 
+      result: getRolesData, 
+      error: getRolesError 
+    } = useQuery(getRoles);
 
     return { 
       columns,
       rows,
       menuMore,
       filter,
-      congregationData,
-      congregations,
-      getCongregationsFunc,
-      getCongregationsLoading,
-      getCongregationsData,
-      getCongregationsError
+      roleData,
+      roles,
+      getRolesFunc,
+      getRolesLoading,
+      getRolesData,
+      getRolesError
     };
   },
   methods:{
     async init(){
       this.$emit('update-nav-bar', {});
       try {
-        await this.getCongregationsFunc();
+        await this.getRolesFunc();
 
-        this.congregations = this.getCongregationsData.getCongregations;
+        this.roles = this.getRolesData.getRoles;
 
-        this.rows = this.congregations.map((congregation: any) => {
+        this.rows = this.roles.map((role: any) => {
           // console.log(profile)
           return {
-            ...congregation,
+            ...role,
             settings: ''
           }
         })
@@ -213,22 +213,22 @@ export default defineComponent({
         console.error('Error al obtener los datos:', error);
       }      
     },
-    closeCreateUpdateCongregationDialog(){
-      this.createUpdateCongregationDialog = false;
+    closeCreateUpdateRoleDialog(){
+      this.createUpdateRoleDialog = false;
     },
-    showCreateUpdateCongregationDialog(volunteer: any, createOrUpdate: boolean){
+    showCreateUpdateRoleDialog(volunteer: any, createOrUpdate: boolean){
       this.createOrUpdate = createOrUpdate;
-      this.congregationData = volunteer;
-      this.createUpdateCongregationDialog = true;
+      this.roleData = volunteer;
+      this.createUpdateRoleDialog = true;
       this.menuMore = [];
     },
-    async getCongregations(){
+    async getRoles(){
       await this.init();
     },
   },
   watch:{
-    getCongregationsLoading(newVal, oldVal){
-      this.isLoading = this.getCongregationsLoading;
+    getRolesLoading(newVal, oldVal){
+      this.isLoading = this.getRolesLoading;
     }
   }
 });
@@ -247,13 +247,13 @@ export default defineComponent({
     color: $secondary;
   }
 
-  .add-congregation-class {
+  .add-role-class {
     font-size: 40px; 
     color: var(--q-primary);
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   }
 
-  .add-congregation-class:hover {
+  .add-role-class:hover {
     color: var(--q-secondary);
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
   }

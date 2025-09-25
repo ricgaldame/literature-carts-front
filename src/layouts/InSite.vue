@@ -183,6 +183,16 @@ let navList = [
     visible: true
   },
   {
+    name: 'roles',
+    title: 'Roles',
+    icon: 'manage_accounts',
+    type: 'link',
+    link: 'roles',
+    navBar: true,
+    separator: true,
+    visible: true
+  },
+  {
     name: 'account',
     title: '',
     icon: 'person',
@@ -301,10 +311,8 @@ export default defineComponent({
         this.navBar[index3].visible = this.isAdmin;
         let index4 = findIdx(this.navBar, 'congregations');
         this.navBar[index4].visible = this.isAdmin;
-        // let index5 = findIdx(this.navBar, 'shifts');
-        // this.navBar[index5].visible = this.isAdmin;
-        // let index6 = findIdx(this.navBar, 'calendar');
-        // this.navBar[index6].visible = this.isAdmin;
+        let index5 = findIdx(this.navBar, 'roles');
+        this.navBar[index5].visible = this.isAdmin;
       }
       else {
         this.$router.replace('/login');

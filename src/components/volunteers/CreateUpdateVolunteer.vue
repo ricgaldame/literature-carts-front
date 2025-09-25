@@ -235,7 +235,7 @@
 						:disable="!createOrUpdate"
 					>
 						<template v-slot:prepend>
-							<q-icon name="people_alt" />
+							<q-icon name="manage_accounts" />
 						</template>
 						<template v-slot:no-option>
 							<q-item>
