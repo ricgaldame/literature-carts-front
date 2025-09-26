@@ -134,6 +134,7 @@ export default defineComponent({
     }
   },
   async mounted(){
+    this.$emit('update-nav-bar', {});
     await this.getRolesFunc();
     await this.getCongregationsFunc();
 
@@ -206,7 +207,6 @@ export default defineComponent({
   },
   methods:{
     async init(){
-      this.$emit('update-nav-bar', {});
       try {
         await this.getUsersFunc({ congregation_code: this.congregation_code });
         this.users = this.getUsersData.getUsers;

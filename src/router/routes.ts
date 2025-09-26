@@ -17,6 +17,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/layouts/InSite.vue'),
     children: [
       { path: '/assignments', component: () => import('src/pages/Assignments.vue') },
+      { path: '/week-template', component: () => import('src/pages/WeekTemplate.vue') },
       { path: '/volunteers', component: () => import('src/pages/Volunteers.vue') },
       { path: '/congregations', component: () => import('src/pages/Congregations.vue') },
       { path: '/roles', component: () => import('src/pages/Roles.vue') },

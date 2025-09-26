@@ -163,6 +163,16 @@ let navList = [
     visible: true
   },
   {
+    name: 'week-template',
+    title: 'Plantilla Semanal',
+    icon: 'edit',
+    type: 'link',
+    link: 'week-template',
+    navBar: true,
+    separator: true,
+    visible: true
+  },
+  {
     name: 'volunteers',
     title: 'Voluntarios',
     icon: 'wc',
@@ -313,6 +323,8 @@ export default defineComponent({
         this.navBar[index4].visible = this.isAdmin;
         let index5 = findIdx(this.navBar, 'roles');
         this.navBar[index5].visible = this.isAdmin;
+        let index6 = findIdx(this.navBar, 'week-template');
+        this.navBar[index6].visible = this.isAdmin;
       }
       else {
         this.$router.replace('/login');

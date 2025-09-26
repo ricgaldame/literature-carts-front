@@ -131,6 +131,7 @@ export default defineComponent({
     }
   },
   async mounted(){
+    this.$emit('update-nav-bar', {});
     await this.init();
     this.isMounted = true;
   },
@@ -169,7 +170,6 @@ export default defineComponent({
   },
   methods:{
     async init(){
-      this.$emit('update-nav-bar', {});
       try {
         await this.getCongregationsFunc();
 
