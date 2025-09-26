@@ -53,6 +53,7 @@
       <AssignmentsTitles 
         :title="'Horas'" 
         :titlesHeight="titlesHeight"
+        :view="view"
       />
       <AssignmentsHours 
         v-for="hour in hours" 
@@ -73,6 +74,7 @@
         <AssignmentsTitles 
           :title="view == 'assignments' ? day.date : day.name" 
           :titlesHeight="titlesHeight"
+          :view="view"
         />
         <AssignmentsDaysWeek 
           :availableScreenHeight="availableScreenHeight"
@@ -90,6 +92,7 @@
         <AssignmentsTitles 
           :title="view == 'assignments' ? day.date : day.name" 
           :titlesHeight="titlesHeight"
+          :view="view"
         />
         <AssignmentsDaysWeek 
           :availableScreenHeight="availableScreenHeight"
