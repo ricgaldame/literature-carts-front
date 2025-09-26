@@ -11,10 +11,10 @@
       }"
     >
       <div style="font-size: 20px;">
-        Congregaciones
+        Puntos
       </div>
-      <div class="add-congregation-class">
-        <q-icon name="add_circle" @click="showCreateUpdateCongregationDialog(null, true)"/>
+      <div class="add-location-class">
+        <q-icon name="add_circle" @click="showCreateUpdateLocationDialog(null, true)"/>
       </div>
     </div>
     <q-table
@@ -74,10 +74,10 @@
                 <q-popup-proxy :offset="[-30, -60]" v-model="menuMore[props.rowIndex]">
                   <q-banner class="more-menu">
                     <div class="column justify-center" style="font-size: 16px">
-                      <div class="menu-profile" @click="showCreateUpdateCongregationDialog(props.row, false)">
-                        <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Congregación
+                      <div class="menu-profile" @click="showCreateUpdateLocationDialog(props.row, false)">
+                        <q-icon name="visibility" size="18px" style="margin-right: 10px;"/>Punto
                       </div>
-                      <div class="menu-profile"  @click="showCreateUpdateCongregationDialog(props.row, true)">
+                      <div class="menu-profile"  @click="showCreateUpdateLocationDialog(props.row, true)">
                         <q-icon name="edit" size="18px" style="margin-right: 10px;"/>Editar
                       </div>
                       <!-- <div 
@@ -98,40 +98,46 @@
       </template>
     </q-table>
   </div>
-  <q-dialog v-model="createUpdateCongregationDialog" persistent>
-    <CreateUpdateCongregation 
-      :congregationDataEntry="congregationData"
+  <q-dialog v-model="createUpdateLocationDialog" persistent>
+    <CreateUpdateLocation 
+      :locationDataEntry="locationData"
       :congregations="congregations"
+      :locations="locations"
       :createOrUpdate="createOrUpdate"
-      @close-create-update-congregation-dialog="closeCreateUpdateCongregationDialog"
-      @get-congregations="getCongregations"
+      @close-create-update-location-dialog="closeCreateUpdateLocationDialog"
+      @get-locations="getLocations"
     />
   </q-dialog>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { getLocations } from 'src/api/queries/getLocations';
 import { getCongregations } from 'src/api/queries/getCongregations';
 import { useQuery } from '@vue/apollo-composable';
-import CreateUpdateCongregation from 'src/components/congregations/CreateUpdateCongregation.vue';
+import CreateUpdateLocation from 'src/components/locations/CreateUpdateLocation.vue';
 
 export default defineComponent({
-  name: 'CongregationsPage',
+  name: 'RolesPage',
   emits: ['update-nav-bar'],
   components: {
-    CreateUpdateCongregation
+    CreateUpdateLocation
   },
   data(){
     return {
       isMounted: false,
       isLoading: false,
       congregation_code: process.env.CONGREGATION_CODE || '',
-      createUpdateCongregationDialog: false,
+      createUpdateLocationDialog: false,
       createOrUpdate: false
     }
   },
   async mounted(){
     this.$emit('update-nav-bar', {});
+    await this.getCongregationsFunc();
+
+    this.congregations = this.getCongregationsData.getCongregations;
+
     await this.init();
     this.isMounted = true;
   },
@@ -140,13 +146,22 @@ export default defineComponent({
     const columns: any = [
       { id: 'id', field: 'id', label: 'ID', align: 'left', },
       { id: 'name', field: 'name', label: 'Nombre', align: 'left', },
-      { id: 'code', field: 'code', label: 'Número', align: 'left', },
+      { id: 'reference', field: 'reference', label: 'Referencia', align: 'left', },
+      { id: 'congregation_name', field: 'congregation_name', label: 'Congregación', align: 'left', },
       { id: 'settings', field: 'settings', label: '', align: 'right', },
     ];
     const rows: any = ref([10]);
     const menuMore: any = ref([]);
-    const congregationData: any = ref(null);
+    const locationData: any = ref(null);
+    const locations: any = ref(null);
     const congregations: any = ref(null);
+
+    const { 
+      refetch: getLocationsFunc, 
+      loading: getLocationsLoading, 
+      result: getLocationsData, 
+      error: getLocationsError 
+    } = useQuery(getLocations);
 
     const { 
       refetch: getCongregationsFunc, 
@@ -160,25 +175,31 @@ export default defineComponent({
       rows,
       menuMore,
       filter,
-      congregationData,
+      locationData,
+      locations,
       congregations,
+      getLocationsFunc,
+      getLocationsLoading,
+      getLocationsData,
+      getLocationsError,
       getCongregationsFunc,
       getCongregationsLoading,
       getCongregationsData,
-      getCongregationsError
+      getCongregationsError,
     };
   },
   methods:{
     async init(){
       try {
-        await this.getCongregationsFunc();
+        await this.getLocationsFunc();
 
-        this.congregations = this.getCongregationsData.getCongregations;
+        this.locations = this.getLocationsData.getLocations;
 
-        this.rows = this.congregations.map((congregation: any) => {
+        this.rows = this.locations.map((location: any) => {
           // console.log(profile)
           return {
-            ...congregation,
+            ...location,
+            congregation_name: location.congregation.name,
             settings: ''
           }
         })
@@ -189,22 +210,25 @@ export default defineComponent({
         console.error('Error al obtener los datos:', error);
       }      
     },
-    closeCreateUpdateCongregationDialog(){
-      this.createUpdateCongregationDialog = false;
+    closeCreateUpdateLocationDialog(){
+      this.createUpdateLocationDialog = false;
     },
-    showCreateUpdateCongregationDialog(congregation: any, createOrUpdate: boolean){
+    showCreateUpdateLocationDialog(location: any, createOrUpdate: boolean){
       this.createOrUpdate = createOrUpdate;
-      this.congregationData = congregation;
-      this.createUpdateCongregationDialog = true;
+      this.locationData = location;
+      this.createUpdateLocationDialog = true;
       this.menuMore = [];
     },
-    async getCongregations(){
+    async getLocations(){
       await this.init();
     },
   },
   watch:{
+    getLocationsLoading(newVal, oldVal){
+      this.isLoading = this.getLocationsLoading || this.getCongregationsLoading;
+    },
     getCongregationsLoading(newVal, oldVal){
-      this.isLoading = this.getCongregationsLoading;
+      this.isLoading = this.getLocationsLoading || this.getCongregationsLoading;
     }
   }
 });
@@ -223,13 +247,13 @@ export default defineComponent({
     color: $secondary;
   }
 
-  .add-congregation-class {
+  .add-location-class {
     font-size: 40px; 
     color: var(--q-primary);
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   }
 
-  .add-congregation-class:hover {
+  .add-location-class:hover {
     color: var(--q-secondary);
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
   }

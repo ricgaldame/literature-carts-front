@@ -192,9 +192,9 @@ export default defineComponent({
     closeCreateUpdateRoleDialog(){
       this.createUpdateRoleDialog = false;
     },
-    showCreateUpdateRoleDialog(volunteer: any, createOrUpdate: boolean){
+    showCreateUpdateRoleDialog(role: any, createOrUpdate: boolean){
       this.createOrUpdate = createOrUpdate;
-      this.roleData = volunteer;
+      this.roleData = role;
       this.createUpdateRoleDialog = true;
       this.menuMore = [];
     },

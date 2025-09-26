@@ -64,7 +64,7 @@ export const userAuth = () => {
 	const updateStorage = async (session: any) => {
 		const profile = await checkProfile(session);
 	
-		const user: any = { ...session.user, ...profile, admin: profile.role == 'admin' };
+		const user: any = { ...session.user, ...profile };
 		
 		if (user?.email_confirmed_at) {
 			setAttributes(user);

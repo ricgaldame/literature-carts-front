@@ -183,6 +183,16 @@ let navList = [
     visible: true
   },
   {
+    name: 'locations',
+    title: 'Puntos',
+    icon: 'location_on',
+    type: 'link',
+    link: 'locations',
+    navBar: true,
+    separator: true,
+    visible: true
+  },
+  {
     name: 'congregations',
     title: 'Congregaciones',
     icon: 'groups',
@@ -246,6 +256,7 @@ export default defineComponent({
       showRightButton: false,
       isSm: this.$q.screen.lt.sm,
       isAdmin: false,
+      isSupervisor: false,
       congregation: ''
     }
   },
@@ -267,6 +278,8 @@ export default defineComponent({
     const congregationStore = useCongregationStore();
 	  const { getCongregation } = storeToRefs(congregationStore);
 
+    const role: any = ref(null);
+
     return {
       leftDrawerOpen,
       toggleLeftDrawer () {
@@ -279,7 +292,8 @@ export default defineComponent({
       scrollContainer,
       scrollContainerWrapper,
       avatar,
-      getCongregation
+      getCongregation,
+      role
     }
   },
   async mounted() {
@@ -288,7 +302,9 @@ export default defineComponent({
       // console.log('getAttributes', this.getAttributes);
       const attributes: any = this.getAttributes;
       this.avatar = attributes?.user_metadata?.avatar_url ? attributes?.user_metadata?.avatar_url : null;
-      this.isAdmin = attributes.admin;
+      this.role = attributes.role;
+      this.isAdmin = this.role == 'admin';
+      this.isSupervisor = this.role == 'supervisor';
       // console.log(attributes)
       // console.log(this.avatar)
     }
@@ -317,14 +333,16 @@ export default defineComponent({
         let index2 = findIdx(this.navBar[index1].menu , 'CUENTA');
         if(this.navBar[index1]?.menu) this.navBar[index1].menu[index2].items[0].name = attributes.email;
 
-        let index3 = findIdx(this.navBar, 'volunteers');
-        this.navBar[index3].visible = this.isAdmin;
-        let index4 = findIdx(this.navBar, 'congregations');
-        this.navBar[index4].visible = this.isAdmin;
-        let index5 = findIdx(this.navBar, 'roles');
-        this.navBar[index5].visible = this.isAdmin;
-        let index6 = findIdx(this.navBar, 'week-template');
+        let index3 = findIdx(this.navBar, 'week-template');
+        this.navBar[index3].visible = this.isAdmin || this.isSupervisor;
+        let index4 = findIdx(this.navBar, 'volunteers');
+        this.navBar[index4].visible = this.isAdmin || this.isSupervisor;
+        let index5 = findIdx(this.navBar, 'locations');
+        this.navBar[index5].visible = this.isAdmin || this.isSupervisor;
+        let index6 = findIdx(this.navBar, 'congregations');
         this.navBar[index6].visible = this.isAdmin;
+        let index7 = findIdx(this.navBar, 'roles');
+        this.navBar[index7].visible = this.isAdmin;
       }
       else {
         this.$router.replace('/login');
