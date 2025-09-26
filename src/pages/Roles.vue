@@ -80,42 +80,18 @@
                       <div class="menu-profile"  @click="showCreateUpdateRoleDialog(props.row, true)">
                         <q-icon name="edit" size="18px" style="margin-right: 10px;"/>Editar
                       </div>
-                      <div 
+                      <!-- <div 
                         class="menu-profile" 
                       >
                         <q-icon name="delete" size="18px" style="margin-right: 10px;"/>Eliminar
-                      </div>
+                      </div> -->
                     </div>
                   </q-banner>
                 </q-popup-proxy>
               </q-icon>
             </div>
             <div v-else>
-              <div v-if="column.id == 'mobilePhone'" class="row justify-start" style="width: 150px;">
-                <div>
-                  {{ props.row[column.id] }}
-                </div>
-                <a
-                  :href="`tel:+${props.row[column.id]}`"
-                  target="_blank"
-                  rel="noopener"
-                  style="margin-left: 5px;"
-                >
-                  <q-icon name="phone_iphone" size="20px" class="text-primary cursor-pointer" />
-                </a>
-
-                <a
-                  :href="`https://wa.me/${props.row[column.id]}`"
-                  target="_blank"
-                  rel="noopener"
-                  style="margin-left: 5px;"
-                >
-                  <q-icon name="fa-brands fa-whatsapp" size="20px" class="text-primary cursor-pointer" />
-                </a>
-              </div>
-              <div v-else>
-                {{ props.row[column.id] }}
-              </div>
+              {{ props.row[column.id] }}
             </div>
           </q-td>
         </q-tr>
